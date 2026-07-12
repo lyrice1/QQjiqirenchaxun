@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <header>
-      <h1>QQ 机器人批量查询工具 v2</h1>
+      <h1>QQ机器人查询管理</h1>
       <p>点击项目按钮快捷发送指令，或在下方输入自定义指令</p>
     </header>
 
