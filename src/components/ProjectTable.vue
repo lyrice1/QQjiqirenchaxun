@@ -1,7 +1,7 @@
 <template>
   <div class="panel">
-    <div class="panel-title">项目指令</div>
     <div class="toolbar-sticky">
+    <div class="panel-title">项目指令</div>
     <div class="toolbar">
       <div class="search-row">
         <input v-model="search" placeholder="搜索项目名称..." class="search-input" />
@@ -584,8 +584,8 @@ function performUndo() {
   font-weight: 600;
   user-select: none;
   position: sticky;
-  top: 0;
-  z-index: 10;
+  top: 90px;
+  z-index: 5;
 }
 
 .group-toggle {

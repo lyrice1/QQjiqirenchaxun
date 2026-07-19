@@ -1,10 +1,11 @@
 <template>
   <div class="app">
-    <div class="top-bar">
-      <header>
-        <h1>QQ机器人查询管理</h1>
-        <p>点击项目按钮快捷发送指令，或在下方输入自定义指令</p>
-      </header>
+    <header>
+      <h1>QQ机器人查询管理</h1>
+      <p>点击项目按钮快捷发送指令，或在下方输入自定义指令</p>
+    </header>
+
+    <main>
       <ConfigPanel
         :config="config"
         :connected="connected"
@@ -13,9 +14,7 @@
         @connect="handleConnect"
         @disconnect="handleDisconnect"
       />
-    </div>
 
-    <main>
       <ProjectTable
         :disabled="!connected || running"
         :expiry-ver="expiryVer"
@@ -611,13 +610,6 @@ body {
   max-width: 960px;
   margin: 0 auto;
   padding: 24px 16px 40px;
-}
-
-.top-bar {
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  background: inherit;
 }
 
 header {
