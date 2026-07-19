@@ -571,7 +571,6 @@ function performUndo() {
   margin-bottom: 16px;
   border: 1.5px solid #e2e8f0;
   border-radius: 10px;
-  overflow: hidden;
 }
 
 .group-header {
