@@ -74,8 +74,8 @@
                 <td class="name-cell">{{ item.name }}</td>
                 <td class="action-cell">
                   <button class="btn-sm btn-login" :disabled="disabled" @click="$emit('send', item.name, 'login', item.name, item.id)">上车</button>
-                  <button class="btn-sm btn-query" :disabled="disabled" @click="$emit('send', '查询', 'query', item.name, item.id)">查询</button>
-                  <button class="btn-sm btn-mgmt" :disabled="disabled" @click="$emit('send', '管理', 'manage', item.name, item.id)">管理</button>
+                  <button class="btn-sm btn-query" :disabled="disabled" @click="$emit('send', `${item.name}查询`, 'query', item.name, item.id)">查询</button>
+                  <button class="btn-sm btn-mgmt" :disabled="disabled" @click="$emit('send', `${item.name}管理`, 'manage', item.name, item.id)">管理</button>
                 </td>
                 <td class="expiry-cell">
                   <span v-if="!item.expiry" class="expiry-empty"></span>
