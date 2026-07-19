@@ -29,6 +29,14 @@
         :total-count="totalCount"
         @clear="messages = []"
       />
+
+      <div class="debug-panel">
+        <div class="debug-title">解析调试</div>
+        <div class="debug-item">dialogMode: {{ dialogMode }}</div>
+        <div class="debug-item">dialogProjectId: {{ dialogProjectId }}</div>
+        <div class="debug-item">tryParseExpiry 被调: {{ debugCalled ? '是' : '否' }}</div>
+        <pre class="debug-content">{{ debugParseResult || '(等待解析...)' }}</pre>
+      </div>
     </main>
 
     <ChatDialog
@@ -45,7 +53,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import ConfigPanel from './components/ConfigPanel.vue'
 import ProjectTable from './components/ProjectTable.vue'
 import ChatDialog from './components/ChatDialog.vue'
@@ -68,10 +76,20 @@ const messages = ref([])
 const completedCount = ref(0)
 const totalCount = ref(0)
 const expiryVer = ref(0)
+const debugParseResult = ref('')
+const debugCalled = ref(false)
 
 let ws = null
 let stopFlag = false
 let sendStartTime = 0
+
+onMounted(() => {
+  // 每2分钟自动备份
+  setInterval(() => {
+    const data = localStorage.getItem('qq-bot-project-groups')
+    if (data) localStorage.setItem('qq-bot-project-groups-backup', data)
+  }, 120000)
+})
 
 function updateConfig(newConfig) {
   Object.assign(config, newConfig)
@@ -393,7 +411,6 @@ function startDialogPolling() {
               dialogMessages.value = [...dialogMessages.value, { role: 'reply', content: text, time: msgTime }]
               addMessage('robot', text, dialogProjectName.value)
               addedTexts.push({ text, msgTime })
-
               tryParseExpiry(text)
             }
           }
@@ -451,8 +468,12 @@ function startDialogPolling() {
 }
 
 function tryParseExpiry(text) {
+  debugCalled.value = true
   if (!dialogProjectId.value) return
   if (dialogMode.value !== 'manage') return
+
+  console.log('[DEBUG] tryParseExpiry called, dialogProjectId=' + dialogProjectId.value + ', mode=' + dialogMode.value)
+  console.log('[DEBUG] raw text:\n' + text)
 
   const lines = text.split('\n')
   const projectEntries = {}
@@ -464,7 +485,9 @@ function tryParseExpiry(text) {
     const headerMatch = line.match(/^={2,}\s*(?:我的)?\s*(.+?)\s*(?:账号)?\s*={2,}$/)
     if (headerMatch) {
       const pn = headerMatch[1].trim()
+      console.log(`[DEBUG] header matched: pn="${pn}"`)
       const found = findProjectIdByName(pn)
+      console.log(`[DEBUG] findProjectIdByName("${pn}") = ${found}, currentProjectId=${currentProjectId}`)
       if (found) {
         currentProjectId = found
       }
@@ -482,25 +505,23 @@ function tryParseExpiry(text) {
     let date = null
     const inlineDate = name.match(/\(到期\s*[:：]\s*(\d{4}[.\-]\d{2}[.\-]\d{2})\)/)
     if (inlineDate) {
-      name = name.replace(/\(到期\s*[:：].*\)/, '').trim()
       date = inlineDate[1].replace(/-/g, '.')
+      const beforeParen = name.replace(/\(.*$/, '').trim()
+      const parenMatch = name.match(/\(([^,)]+)/)
+      const innerName = parenMatch ? parenMatch[1].trim() : ''
+      name = innerName ? `${beforeParen}(${innerName})` : beforeParen
     } else {
-      const authDate = line.match(/授权\s*[:：]\s*[^\d]*(\d{4}[.\-]\d{2}[.\-]\d{2})/)
-      if (authDate) {
-        date = authDate[1].replace(/-/g, '.')
-      } else {
-        for (let j = i + 1; j <= Math.min(i + 4, lines.length - 1); j++) {
-          const nl = lines[j].trim()
-          if (/^\[/.test(nl)) break
-          const m = nl.match(/(\d{4}[.\-]\d{2}[.\-]\d{2})/)
-          if (m && /到期|授权/.test(nl)) {
-            date = m[1].replace(/-/g, '.')
-            break
-          }
-        }
+      for (let j = i + 1; j <= Math.min(i + 4, lines.length - 1); j++) {
+        const nl = lines[j].trim()
+        if (/^\[/.test(nl) && !/授权/.test(nl)) break
+        const m = nl.match(/授权\s*[:：]\s*[^\d]*(\d{4}[.\-]\d{2}[.\-]\d{2})/)
+        if (m) { date = m[1].replace(/-/g, '.'); break }
+        const m2 = nl.match(/(\d{4}[.\-]\d{2}[.\-]\d{2})/)
+        if (m2 && /到期|授权/.test(nl)) { date = m2[1].replace(/-/g, '.'); break }
       }
     }
 
+    console.log(`[DEBUG] acct[${num}] name="${name}" date="${date}"`)
     if (date) {
       if (!projectEntries[currentProjectId]) projectEntries[currentProjectId] = []
       projectEntries[currentProjectId].push(`${date}-${name}`)
@@ -508,12 +529,15 @@ function tryParseExpiry(text) {
   }
 
   let updated = false
+  const debugInfo = {}
   for (const [pid, entries] of Object.entries(projectEntries)) {
     if (entries.length) {
       updateProjectExpiryById(pid, entries.join('\n'))
       updated = true
+      debugInfo[pid] = entries
     }
   }
+  debugParseResult.value = JSON.stringify(debugInfo, null, 2)
 
   if (!updated) {
     const globalRe = /(\d{4}[.\-]\d{2}[.\-]\d{2})/g
@@ -531,7 +555,11 @@ function tryParseExpiry(text) {
     }
   }
 
-  if (updated) expiryVer.value++
+  if (updated) {
+    console.log('[DEBUG] updated entries:', entries)
+    console.log('[DEBUG] stored value:', localStorage.getItem('qq-bot-project-groups'))
+    expiryVer.value++
+  }
 }
 </script>
 
@@ -541,6 +569,33 @@ function tryParseExpiry(text) {
   padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
+}
+
+.debug-panel {
+  background: #1a1a2e;
+  color: #00ff88;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.debug-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #ff6b6b;
+}
+
+.debug-item {
+  color: #aaddff;
+  margin-bottom: 4px;
+}
+
+.debug-content {
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 body {

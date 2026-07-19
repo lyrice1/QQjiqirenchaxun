@@ -23,8 +23,11 @@
         </select>
         <button v-if="selectedCount === 1" class="btn btn-batch" @click="moveSelectedProjectUp" title="上移选中项目">▲ 上移</button>
         <button v-if="selectedCount === 1" class="btn btn-batch" @click="moveSelectedProjectDown" title="下移选中项目">▼ 下移</button>
-        <button class="btn btn-reset" @click="resetAll">重置</button>
-        <button v-if="undoStack.length" class="btn btn-undo" @click="performUndo">撤销 ({{ undoStack.length }})</button>
+         <button class="btn btn-export" @click="exportData">导出数据</button>
+         <button class="btn btn-import" @click="triggerImport">导入数据</button>
+         <input ref="importInput" type="file" accept=".json" style="display:none" @change="importData" />
+         <button class="btn btn-reset" @click="resetAll">重置</button>
+         <button v-if="undoStack.length" class="btn btn-undo" @click="performUndo">撤销 ({{ undoStack.length }})</button>
       </div>
     </div>
 
@@ -74,7 +77,12 @@
                   <button class="btn-sm btn-query" :disabled="disabled" @click="$emit('send', `${item.name}查询`, 'query', item.name, item.id)">查询</button>
                   <button class="btn-sm btn-mgmt" :disabled="disabled" @click="$emit('send', `${item.name}管理`, 'manage', item.name, item.id)">管理</button>
                 </td>
-                <td class="expiry-cell" :class="getExpiryClass(item.expiry)">{{ item.expiry || '' }}</td>
+                <td class="expiry-cell">
+                  <span v-if="!item.expiry" class="expiry-empty"></span>
+                  <template v-else>
+                    <span v-for="(line, li) in item.expiry.split('\n')" :key="li" :class="getExpiryClass(line)" class="expiry-line">{{ line }}</span>
+                  </template>
+                </td>
                 <td class="custom-cell">
                   <div v-if="(item.customCommands || []).length" class="cmd-send-btns">
                     <span v-for="(cmd, ci) in (item.customCommands || [])" :key="cmd" class="cmd-btn-wrap">
@@ -141,6 +149,7 @@ const newCmd = ref('')
 const moveTargetGroup = ref('')
 const undoStack = ref([])
 const groups = ref(getGroups())
+const importInput = ref(null)
 
 watch(() => props.expiryVer, () => {
   groups.value = getGroups()
@@ -406,6 +415,46 @@ function sortByExpiry(gid) {
   groups.value = getGroups()
 }
 
+function exportData() {
+  const data = localStorage.getItem('qq-bot-project-groups')
+  if (!data) {
+    alert('没有可导出的数据')
+    return
+  }
+  const blob = new Blob([data], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `qq-bot-backup-${new Date().toISOString().slice(0, 10)}.json`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+function triggerImport() {
+  importInput.value?.click()
+}
+
+function importData(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result)
+      if (!Array.isArray(data)) throw new Error('格式错误')
+      if (!confirm(`即将导入 ${data.length} 个分组的数据，当前数据将被覆盖，确定继续吗？`)) return
+      saveUndoSnapshot()
+      localStorage.setItem('qq-bot-project-groups', JSON.stringify(data))
+      groups.value = getGroups()
+      selected.value = new Set()
+    } catch (err) {
+      alert('导入失败：文件格式不正确，请选择之前导出的 .json 备份文件')
+    }
+  }
+  reader.readAsText(file)
+  e.target.value = ''
+}
+
 function performUndo() {
   if (!undoStack.value.length) return
   const snapshot = undoStack.value.pop()
@@ -546,6 +595,28 @@ function performUndo() {
   box-shadow: 0 4px 10px rgba(253, 203, 110, 0.4);
 }
 
+.btn-export {
+  background: linear-gradient(135deg, #00b894, #00a381);
+  color: #fff;
+  font-size: 12px;
+  box-shadow: 0 2px 6px rgba(0, 184, 148, 0.25);
+}
+
+.btn-export:hover {
+  box-shadow: 0 4px 10px rgba(0, 184, 148, 0.35);
+}
+
+.btn-import {
+  background: linear-gradient(135deg, #6c5ce7, #5a4bd1);
+  color: #fff;
+  font-size: 12px;
+  box-shadow: 0 2px 6px rgba(108, 92, 231, 0.25);
+}
+
+.btn-import:hover {
+  box-shadow: 0 4px 10px rgba(108, 92, 231, 0.35);
+}
+
 .btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -568,6 +639,9 @@ function performUndo() {
   font-size: 14px;
   font-weight: 600;
   user-select: none;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .group-toggle {
@@ -655,19 +729,24 @@ function performUndo() {
   color: #667eea;
 }
 
-.ptable th,
 .ptable td {
   padding: 8px 10px;
   text-align: left;
   border-bottom: 1px solid #f0f1f8;
   white-space: nowrap;
+  vertical-align: middle;
 }
 
 .ptable th {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid #f0f1f8;
+  white-space: nowrap;
   background: #fafbfc;
   font-weight: 600;
   color: #4a5568;
   font-size: 12px;
+  vertical-align: middle;
 }
 
 .ptable tr:hover td {
@@ -684,9 +763,12 @@ function performUndo() {
 }
 
 .action-cell {
-  display: flex;
-  gap: 3px;
-  align-items: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.action-cell .btn-sm {
+  margin-right: 3px;
 }
 
 .custom-cell {
@@ -742,9 +824,27 @@ function performUndo() {
 .expiry-cell {
   font-size: 12px;
   color: #4a5568;
+  min-width: 160px;
   white-space: pre-wrap;
   word-break: break-word;
-  min-width: 100px;
+}
+
+.expiry-line {
+  display: block;
+  line-height: 1.6;
+}
+
+.expiry-empty {
+  display: block;
+}
+
+.expiry-line {
+  display: block;
+  line-height: 1.6;
+}
+
+.expiry-empty {
+  display: block;
 }
 
 .expiry-green {

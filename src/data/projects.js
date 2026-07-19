@@ -37,7 +37,17 @@ function genId() {
 function loadGroups() {
   try {
     const saved = localStorage.getItem('qq-bot-project-groups')
-    if (saved) return JSON.parse(saved)
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed
+    }
+  } catch (e) { /* ignore */ }
+  try {
+    const backup = localStorage.getItem('qq-bot-project-groups-backup')
+    if (backup) {
+      const parsed = JSON.parse(backup)
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed
+    }
   } catch (e) { /* ignore */ }
   return JSON.parse(JSON.stringify(defaultGroups))
 }
@@ -61,7 +71,9 @@ export function getGroups() {
 }
 
 export function saveGroups() {
-  localStorage.setItem('qq-bot-project-groups', JSON.stringify(_groups))
+  const json = JSON.stringify(_groups)
+  localStorage.setItem('qq-bot-project-groups', json)
+  localStorage.setItem('qq-bot-project-groups-backup', json)
 }
 
 export function addGroup(name) {
@@ -220,8 +232,16 @@ export function findProjectIdByName(name) {
   for (const g of _groups) {
     for (const p of g.projects) {
       if (p.name.toLowerCase() === lower) return p.id
-      if (p.name.includes(name)) return p.id
+    }
+  }
+  for (const g of _groups) {
+    for (const p of g.projects) {
       if (name.includes(p.name)) return p.id
+    }
+  }
+  for (const g of _groups) {
+    for (const p of g.projects) {
+      if (p.name.includes(name)) return p.id
     }
   }
   return null
