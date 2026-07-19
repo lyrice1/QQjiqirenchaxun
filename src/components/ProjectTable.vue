@@ -74,8 +74,8 @@
                 <td class="name-cell">{{ item.name }}</td>
                 <td class="action-cell">
                   <button class="btn-sm btn-login" :disabled="disabled" @click="$emit('send', item.name, 'login', item.name, item.id)">上车</button>
-                  <button class="btn-sm btn-query" :disabled="disabled" @click="$emit('send', `${item.name}查询`, 'query', item.name, item.id)">查询</button>
-                  <button class="btn-sm btn-mgmt" :disabled="disabled" @click="$emit('send', `${item.name}管理`, 'manage', item.name, item.id)">管理</button>
+                  <button class="btn-sm btn-query" :disabled="disabled" @click="$emit('send', '查询', 'query', item.name, item.id)">查询</button>
+                  <button class="btn-sm btn-mgmt" :disabled="disabled" @click="$emit('send', '管理', 'manage', item.name, item.id)">管理</button>
                 </td>
                 <td class="expiry-cell">
                   <span v-if="!item.expiry" class="expiry-empty"></span>
@@ -86,7 +86,7 @@
                 <td class="custom-cell">
                   <div v-if="(item.customCommands || []).length" class="cmd-send-btns">
                     <span v-for="(cmd, ci) in (item.customCommands || [])" :key="cmd" class="cmd-btn-wrap">
-                      <button class="btn-sm btn-custom-send" :disabled="disabled" @click="$emit('send', item.name + cmd, 'custom', item.name, item.id)" :title="`发送: ${item.name}${cmd}`">{{ cmd }}</button>
+                      <button class="btn-sm btn-custom-send" :disabled="disabled" @click="$emit('send', cmd, 'custom', item.name, item.id)" :title="`发送: ${cmd}`">{{ cmd }}</button>
                       <button class="btn-cmd-del" :disabled="disabled" @click="removeCmd(group.id, item.id, ci)" title="删除此指令">×</button>
                     </span>
                   </div>
