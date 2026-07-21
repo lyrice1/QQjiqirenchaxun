@@ -133,7 +133,7 @@
 
 <script setup>
 import { ref, computed, watch, nextTick } from 'vue'
-import { getGroups, saveGroups, addProject as addProjectData, deleteProject, renameGroup, addGroup as addGroupData, deleteGroup, reorderGroup, reorderProject, resetToDefault, moveProject, addCustomCommand, removeCustomCommand, updateProjectRemark, sortProjectsByExpiry } from '../data/projects.js'
+import { getGroups, saveGroups, addProject as addProjectData, deleteProject, renameGroup, addGroup as addGroupData, deleteGroup, reorderGroup, reorderProject, resetToDefault, moveProject, addCustomCommand, removeCustomCommand, updateProjectRemark, sortProjectsByExpiry, restoreGroups } from '../data/projects.js'
 
 const props = defineProps({ disabled: Boolean, expiryVer: Number })
 const emit = defineEmits(['send', 'batchQuery'])
@@ -418,7 +418,7 @@ function sortByExpiry(gid) {
 function performUndo() {
   if (!undoStack.value.length) return
   const snapshot = undoStack.value.pop()
-  localStorage.setItem('qq-bot-project-groups', JSON.stringify(snapshot))
+  restoreGroups(snapshot)
   groups.value = getGroups()
   selected.value = new Set()
 }

@@ -59,7 +59,7 @@ import ProjectTable from './components/ProjectTable.vue'
 import ChatDialog from './components/ChatDialog.vue'
 import ResultPanel from './components/ResultPanel.vue'
 import { sendPrivateMessage, sendGroupMessage, getLoginInfo, setBaseUrl, setToken, getFriendMsgHistory } from './api/napcat.js'
-import { updateProjectExpiryById, findProjectIdByName } from './data/projects.js'
+import { updateProjectExpiryById, findProjectIdByName, initGroups } from './data/projects.js'
 
 const config = reactive({
   apiUrl: '/api',
@@ -78,17 +78,16 @@ const totalCount = ref(0)
 const expiryVer = ref(0)
 const debugParseResult = ref('')
 const debugCalled = ref(false)
+const dataReady = ref(false)
 
 let ws = null
 let stopFlag = false
 let sendStartTime = 0
 
-onMounted(() => {
-  // 每2分钟自动备份
-  setInterval(() => {
-    const data = localStorage.getItem('qq-bot-project-groups')
-    if (data) localStorage.setItem('qq-bot-project-groups-backup', data)
-  }, 120000)
+onMounted(async () => {
+  await initGroups()
+  dataReady.value = true
+  expiryVer.value++
 })
 
 function updateConfig(newConfig) {
@@ -557,7 +556,6 @@ function tryParseExpiry(text) {
 
   if (updated) {
     console.log('[DEBUG] updated entries:', entries)
-    console.log('[DEBUG] stored value:', localStorage.getItem('qq-bot-project-groups'))
     expiryVer.value++
   }
 }

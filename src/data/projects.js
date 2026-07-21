@@ -1,3 +1,5 @@
+import { loadRemote, saveRemote, resetRemote } from './api.js'
+
 const defaultGroups = [
   {
     id: 'g1',
@@ -34,7 +36,10 @@ function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
 }
 
-function loadGroups() {
+async function loadGroups() {
+  const remoteData = await loadRemote()
+  if (remoteData) return remoteData
+
   try {
     const saved = localStorage.getItem('qq-bot-project-groups')
     if (saved) {
@@ -52,7 +57,18 @@ function loadGroups() {
   return JSON.parse(JSON.stringify(defaultGroups))
 }
 
-let _groups = loadGroups()
+let _groups = JSON.parse(JSON.stringify(defaultGroups))
+let _readyPromise = null
+
+export function initGroups() {
+  if (!_readyPromise) {
+    _readyPromise = loadGroups().then(data => {
+      _groups = data
+      return _groups
+    })
+  }
+  return _readyPromise
+}
 
 function ensureFields(project) {
   if (!project.customCommands) project.customCommands = []
@@ -74,6 +90,7 @@ export function saveGroups() {
   const json = JSON.stringify(_groups)
   localStorage.setItem('qq-bot-project-groups', json)
   localStorage.setItem('qq-bot-project-groups-backup', json)
+  saveRemote(_groups)
 }
 
 export function addGroup(name) {
@@ -247,7 +264,18 @@ export function findProjectIdByName(name) {
   return null
 }
 
-export function resetToDefault() {
+export async function resetToDefault() {
   localStorage.removeItem('qq-bot-project-groups')
-  _groups = JSON.parse(JSON.stringify(defaultGroups))
+  const remoteGroups = await resetRemote()
+  if (remoteGroups) {
+    _groups = remoteGroups
+  } else {
+    _groups = JSON.parse(JSON.stringify(defaultGroups))
+    saveGroups()
+  }
+}
+
+export function restoreGroups(snapshot) {
+  _groups = JSON.parse(JSON.stringify(snapshot))
+  saveGroups()
 }
