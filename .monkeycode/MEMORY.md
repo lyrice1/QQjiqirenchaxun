@@ -5,10 +5,14 @@
 - **部署目标**：飞牛 NAS Docker，不部署到云服务器
 - **云服务器** (103.236.92.3:41185)：只跑幼儿园项目，**不要在上面改任何东西**
 - **构建命令**：`npm run build`，产物在 `dist/`
-- **Docker 部署包**：`tar czf qqbot-deploy.tar.gz dist default.conf Dockerfile`
+- **Docker 部署包**：`tar czf qqbot-deploy.tar.gz dist default.conf Dockerfile docker-entrypoint.sh server/`
 - **部署命令**（在飞牛终端执行）：
   ```bash
-  curl -fsSL <下载url> | tar xz && docker build -t qq-batch-query . && docker stop qq-batch-query 2>/dev/null; docker rm qq-batch-query 2>/dev/null; docker run -d --name qq-batch-query --restart unless-stopped -p 3080:80 qq-batch-query
+  curl -fsSL <下载url> | tar xz && docker build -t qq-batch-query . && docker stop qq-batch-query 2>/dev/null; docker rm qq-batch-query 2>/dev/null; docker run -d --name qq-batch-query --restart unless-stopped -p 3080:80 -v /vol1/@appstore/docker/qqbot-data:/data qq-batch-query
+  ```
+- **从 GitHub 部署**（飞牛 Docker 内已有旧项目目录时）：
+  ```bash
+  git pull && npm run build && docker build -t qq-batch-query . && docker stop qq-batch-query 2>/dev/null; docker rm qq-batch-query 2>/dev/null; docker run -d --name qq-batch-query --restart unless-stopped -p 3080:80 -v /vol1/@appstore/docker/qqbot-data:/data qq-batch-query
   ```
 - **飞牛访问**：不能直接 SSH，端口开了但 FN Connect 不走原生 TCP。需通过 FN Connect WebUI 暴露 Docker 端口或用 Web 界面管理。
 - **GitHub**：`https://github.com/lyrice1/QQjiqirenchaxun`
@@ -16,6 +20,10 @@
 ## Nginx/Docker 配置
 
 - `default.conf` 代理 `/api/` → `http://172.17.0.1:3100/`（同机 NapCat Docker）
+- `default.conf` 代理 `/data-api/` → `http://127.0.0.1:3002`（容器内 Express 后端）
+- Dockerfile 使用多阶段构建：backend-deps 阶段安装 server npm 依赖，运行阶段用 nginx:alpine + nodejs
+- `docker-entrypoint.sh` 先启动 Node.js 后端，再启动 Nginx
+- 数据库文件通过 `-v /vol1/@appstore/docker/qqbot-data:/data` 挂载到宿主机，确保持久化
 - NapCat 在飞牛 Docker 中，外部通过 FN Connect（如 `https://9ee993fa6a31-0.ly19941011.5ddd.com/`）访问
 - `index.html` 必须设 `Cache-Control: no-cache`，否则旧页面缓存导致需要刷新
 
@@ -48,10 +56,18 @@ setInterval(async () => { ... }, 1500)
 
 ## 数据备份
 
-- 主数据存储在 `localStorage['qq-bot-project-groups']`
-- `saveGroups()` 同时写入备份 key `qq-bot-project-groups-backup`
-- `loadGroups()` 在主数据损坏/缺失时自动从备份恢复
-- 已移除导入导出 UI 按钮，只保留自动备份机制
+- **服务端存储**：数据存储在 SQLite 数据库 `/data/data.db`（Docker 挂载确保持久化）
+- **前端回退**：localStorage 仍保留作为离线缓存，服务端不可用时回退到本地
+- `saveGroups()` 同时写入 localStorage（备份 key）和通过 `/data-api/groups` PUT 到服务端
+- `loadGroups()` 优先从服务端加载，失败时回退到 localStorage
+
+## 服务端 API
+
+- Express 后端运行在容器内 `127.0.0.1:3002`，Nginx 代理 `/data-api/` → `http://127.0.0.1:3002`
+- API 端点：
+  - `GET /data-api/groups` - 获取所有分组和项目
+  - `PUT /data-api/groups` - 全量保存
+  - `POST /data-api/groups/reset` - 重置为默认数据
 
 ## 按钮发送行为
 
