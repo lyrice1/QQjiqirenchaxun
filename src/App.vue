@@ -63,7 +63,7 @@ import { updateProjectExpiryById, findProjectIdByName, initGroups } from './data
 
 const config = reactive({
   apiUrl: '/api',
-  token: 'hzqOYLEdHS_rz0CN',
+  token: '76XiyR8qWoE23AP4',
   targetId: '3417340167',
   chatType: 'private',
   interval: 1500

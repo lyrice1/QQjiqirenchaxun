@@ -57,31 +57,25 @@ function writeData(data) {
   fs.writeFileSync(dataPath, JSON.stringify(data, null, 2), 'utf-8')
 }
 
-let cachedGroups = null
-
-function ensureInit() {
-  if (cachedGroups) return
-  const saved = readData()
-  if (saved && Array.isArray(saved) && saved.length > 0) {
-    cachedGroups = saved
-  } else {
-    cachedGroups = JSON.parse(JSON.stringify(defaultGroups))
-    writeData(cachedGroups)
-  }
+// True only once real data has been persisted (via save / migrate / reset).
+export function hasPersistedData() {
+  return fs.existsSync(dataPath)
 }
 
+// Returns null when no data file exists yet, so the client knows to migrate
+// its local storage. Defaults are only used as a client-side fallback.
 export function loadGroups() {
-  ensureInit()
-  cachedGroups = readData() || cachedGroups
-  return JSON.parse(JSON.stringify(cachedGroups))
+  const saved = readData()
+  if (saved && Array.isArray(saved) && saved.length > 0) {
+    return JSON.parse(JSON.stringify(saved))
+  }
+  return null
 }
 
 export function saveGroups(groups) {
-  cachedGroups = JSON.parse(JSON.stringify(groups))
-  writeData(cachedGroups)
+  writeData(JSON.parse(JSON.stringify(groups)))
 }
 
 export function resetToDefault() {
-  cachedGroups = JSON.parse(JSON.stringify(defaultGroups))
-  writeData(cachedGroups)
+  writeData(JSON.parse(JSON.stringify(defaultGroups)))
 }

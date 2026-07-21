@@ -1,9 +1,9 @@
 #!/bin/sh
-set -e
-
+# Persist project data to a mounted volume (/data) so it survives container recreation.
 mkdir -p /data
-ln -sf /data/data.db /app/server/data.db 2>/dev/null || true
+export DATA_DIR=/data
+export PORT=3002
 
+# Boot the API server in the background, nginx (static + /api proxy) in foreground.
 node /app/server/index.js &
-
 exec nginx -g "daemon off;"

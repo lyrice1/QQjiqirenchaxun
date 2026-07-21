@@ -1,4 +1,4 @@
-import { loadRemote, saveRemote, resetRemote } from './api.js'
+import { loadRemote, saveRemote, resetRemote, migrateRemote, isServerAvailable } from './api.js'
 
 const defaultGroups = [
   {
@@ -36,25 +36,86 @@ function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
 }
 
-async function loadGroups() {
-  const remoteData = await loadRemote()
-  if (remoteData) return remoteData
+// ---- Real-time sync (SSE) ----
+const changeListeners = new Set()
+let syncStarted = false
 
+export function onGroupsChange(cb) {
+  changeListeners.add(cb)
+  return () => changeListeners.delete(cb)
+}
+
+function notifyGroupsChange() {
+  for (const cb of changeListeners) {
+    try { cb(_groups) } catch (e) { /* ignore */ }
+  }
+}
+
+export function startRemoteSync() {
+  if (syncStarted) return
+  syncStarted = true
+  if (typeof EventSource === 'undefined') return
   try {
-    const saved = localStorage.getItem('qq-bot-project-groups')
+    const es = new EventSource('/data-api/groups/events')
+    es.onmessage = async () => {
+      const remote = await loadRemote()
+      if (remote) {
+        _groups = remote
+        notifyGroupsChange()
+      }
+    }
+    es.onerror = () => { /* EventSource auto-reconnects */ }
+  } catch (e) {
+    console.warn('[SYNC] SSE 初始化失败:', e)
+  }
+}
+
+// ---- Loading / migration ----
+function readLocalStorage(key) {
+  try {
+    const saved = localStorage.getItem(key)
     if (saved) {
       const parsed = JSON.parse(saved)
       if (Array.isArray(parsed) && parsed.length > 0) return parsed
     }
   } catch (e) { /* ignore */ }
-  try {
-    const backup = localStorage.getItem('qq-bot-project-groups-backup')
-    if (backup) {
-      const parsed = JSON.parse(backup)
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed
+  return null
+}
+
+function defaultNames() {
+  return defaultGroups.map(g => ({ name: g.name, projects: g.projects.map(p => p.name) }))
+}
+
+function isDefaultData(local) {
+  if (!Array.isArray(local) || local.length !== defaultGroups.length) return false
+  const d = defaultNames()
+  return local.every((g, i) =>
+    g.name === d[i].name &&
+    Array.isArray(g.projects) &&
+    g.projects.length === d[i].projects.length &&
+    g.projects.every((p, j) => (p.name || '') === d[i].projects[j])
+  )
+}
+
+async function loadGroups() {
+  const remoteData = await loadRemote()
+  if (remoteData) return remoteData
+
+  // Server empty -> fall back to local storage, then migrate once (first writer wins)
+  let local = readLocalStorage('qq-bot-project-groups')
+  if (!local) local = readLocalStorage('qq-bot-project-groups-backup')
+  if (!local) local = JSON.parse(JSON.stringify(defaultGroups))
+
+  if (isServerAvailable() && !isDefaultData(local)) {
+    const r = await migrateRemote(local)
+    if (r?.written) {
+      return local
+    } else if (r && r.written === false) {
+      const remote2 = await loadRemote()
+      if (remote2) return remote2
     }
-  } catch (e) { /* ignore */ }
-  return JSON.parse(JSON.stringify(defaultGroups))
+  }
+  return local
 }
 
 let _groups = JSON.parse(JSON.stringify(defaultGroups))
@@ -64,6 +125,7 @@ export function initGroups() {
   if (!_readyPromise) {
     _readyPromise = loadGroups().then(data => {
       _groups = data
+      if (isServerAvailable()) startRemoteSync()
       return _groups
     })
   }

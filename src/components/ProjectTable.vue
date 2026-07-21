@@ -133,10 +133,13 @@
 
 <script setup>
 import { ref, computed, watch, nextTick } from 'vue'
-import { getGroups, saveGroups, addProject as addProjectData, deleteProject, renameGroup, addGroup as addGroupData, deleteGroup, reorderGroup, reorderProject, resetToDefault, moveProject, addCustomCommand, removeCustomCommand, updateProjectRemark, sortProjectsByExpiry, restoreGroups } from '../data/projects.js'
+import { getGroups, saveGroups, addProject as addProjectData, deleteProject, renameGroup, addGroup as addGroupData, deleteGroup, reorderGroup, reorderProject, resetToDefault, moveProject, addCustomCommand, removeCustomCommand, updateProjectRemark, sortProjectsByExpiry, restoreGroups, onGroupsChange } from '../data/projects.js'
 
 const props = defineProps({ disabled: Boolean, expiryVer: Number })
 const emit = defineEmits(['send', 'batchQuery'])
+
+// Live cross-browser sync: re-render when another client pushes an update
+onGroupsChange(() => { groups.value = getGroups() })
 
 const search = ref('')
 const collapsed = ref({})

@@ -3,6 +3,10 @@ const API_BASE = '/data-api'
 let remoteLoaded = false
 let serverAvailable = true
 
+export function isServerAvailable() {
+  return serverAvailable
+}
+
 export async function loadRemote() {
   try {
     const res = await fetch(`${API_BASE}/groups`)
@@ -10,6 +14,7 @@ export async function loadRemote() {
     const data = await res.json()
     serverAvailable = true
     remoteLoaded = true
+    if (data == null) return null
     return data
   } catch (e) {
     serverAvailable = false
@@ -28,6 +33,21 @@ export function saveRemote(groups) {
     serverAvailable = false
     console.warn('[API] 保存到服务端失败:', e.message)
   })
+}
+
+// One-shot migration: only succeeds (written:true) if the server has no data yet.
+export async function migrateRemote(groups) {
+  try {
+    const res = await fetch(`${API_BASE}/groups/migrate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(groups)
+    })
+    if (res.ok) return await res.json()
+  } catch (e) {
+    console.warn('[API] 迁移到服务端失败:', e.message)
+  }
+  return null
 }
 
 export async function resetRemote() {
