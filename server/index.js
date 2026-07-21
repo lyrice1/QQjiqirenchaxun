@@ -6,7 +6,7 @@ import { loadGroups, saveGroups, resetToDefault } from './db.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
-const PORT = process.env.PORT || 80
+const PORT = process.env.PORT || 3000
 const NAPCAT_TARGET = process.env.NAPCAT_TARGET || 'http://172.17.0.1:3100'
 
 app.use(express.json({ limit: '10mb' }))

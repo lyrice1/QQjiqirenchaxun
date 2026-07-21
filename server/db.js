@@ -1,42 +1,10 @@
-import Database from 'better-sqlite3'
-import { fileURLToPath } from 'url'
+import fs from 'fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const dbPath = path.join(__dirname, 'data.db')
-
-const db = new Database(dbPath)
-
-db.pragma('journal_mode = WAL')
-db.pragma('foreign_keys = ON')
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS groups_t (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    sort_order INTEGER NOT NULL DEFAULT 0
-  );
-
-  CREATE TABLE IF NOT EXISTS projects (
-    id TEXT PRIMARY KEY,
-    group_id TEXT NOT NULL REFERENCES groups_t(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    remark TEXT DEFAULT '',
-    expiry TEXT DEFAULT '',
-    sort_order INTEGER NOT NULL DEFAULT 0
-  );
-
-  CREATE TABLE IF NOT EXISTS custom_commands (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-    command TEXT NOT NULL,
-    sort_order INTEGER NOT NULL DEFAULT 0
-  );
-`)
-
-function genId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
-}
+const dataDir = process.env.DATA_DIR || __dirname
+const dataPath = path.join(dataDir, 'data.json')
 
 const defaultGroups = [
   {
@@ -49,7 +17,7 @@ const defaultGroups = [
       '民发广场', '裕丰广场', '佑三', '伊的家', '浓五酒馆', '绿动新球',
       '鼎鸿保龄球', '回收蛙', '薇诺娜', '豪爵', '移动云盘', '绿地',
       'Epic游戏', '中康未来'
-    ]
+    ].map(name => ({ id: genId(), name, customCommands: [], remark: '' }))
   },
   {
     id: 'g2',
@@ -66,91 +34,54 @@ const defaultGroups = [
       '小牛牛', '爱海盐', '江淮卡友', '杜蕾斯', 'keep运动', '酷我',
       '甬派', '白鲸鱼', '天牛回收', '旧衣小二', '科普', '嘉善',
       '芳华未来', '爱坤', '捷停车', '酷我提现'
-    ]
+    ].map(name => ({ id: genId(), name, customCommands: [], remark: '' }))
   }
 ]
 
-function seedIfEmpty() {
-  const count = db.prepare('SELECT COUNT(*) as c FROM groups_t').get()
-  if (count.c > 0) return
-
-  const insertGroup = db.prepare('INSERT INTO groups_t (id, name, sort_order) VALUES (?, ?, ?)')
-  const insertProject = db.prepare('INSERT INTO projects (id, group_id, name, sort_order) VALUES (?, ?, ?, ?)')
-
-  const tx = db.transaction(() => {
-    defaultGroups.forEach((g, gi) => {
-      insertGroup.run(g.id, g.name, gi)
-      g.projects.forEach((name, pi) => {
-        insertProject.run(genId(), g.id, name, pi)
-      })
-    })
-  })
-  tx()
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
 }
 
-seedIfEmpty()
+function readData() {
+  try {
+    const raw = fs.readFileSync(dataPath, 'utf-8')
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
+function writeData(data) {
+  const dir = path.dirname(dataPath)
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+  fs.writeFileSync(dataPath, JSON.stringify(data, null, 2), 'utf-8')
+}
+
+let cachedGroups = null
+
+function ensureInit() {
+  if (cachedGroups) return
+  const saved = readData()
+  if (saved && Array.isArray(saved) && saved.length > 0) {
+    cachedGroups = saved
+  } else {
+    cachedGroups = JSON.parse(JSON.stringify(defaultGroups))
+    writeData(cachedGroups)
+  }
+}
 
 export function loadGroups() {
-  const groups = db.prepare('SELECT * FROM groups_t ORDER BY sort_order').all()
-  return groups.map(g => {
-    const projects = db.prepare('SELECT * FROM projects WHERE group_id = ? ORDER BY sort_order').all(g.id)
-    return {
-      id: g.id,
-      name: g.name,
-      projects: projects.map(p => {
-        const commands = db.prepare('SELECT * FROM custom_commands WHERE project_id = ? ORDER BY sort_order').all(p.id)
-        return {
-          id: p.id,
-          name: p.name,
-          remark: p.remark || '',
-          expiry: p.expiry || '',
-          customCommands: commands.map(c => c.command)
-        }
-      })
-    }
-  })
+  ensureInit()
+  cachedGroups = readData() || cachedGroups
+  return JSON.parse(JSON.stringify(cachedGroups))
 }
 
 export function saveGroups(groups) {
-  const tx = db.transaction(() => {
-    db.prepare('DELETE FROM custom_commands').run()
-    db.prepare('DELETE FROM projects').run()
-    db.prepare('DELETE FROM groups_t').run()
-
-    const insertGroup = db.prepare('INSERT INTO groups_t (id, name, sort_order) VALUES (?, ?, ?)')
-    const insertProject = db.prepare('INSERT INTO projects (id, group_id, name, remark, expiry, sort_order) VALUES (?, ?, ?, ?, ?, ?)')
-    const insertCommand = db.prepare('INSERT INTO custom_commands (project_id, command, sort_order) VALUES (?, ?, ?)')
-
-    groups.forEach((g, gi) => {
-      insertGroup.run(g.id, g.name, gi)
-      g.projects.forEach((p, pi) => {
-        insertProject.run(p.id, g.id, p.name, p.remark || '', p.expiry || '', pi)
-        if (p.customCommands && p.customCommands.length) {
-          p.customCommands.forEach((cmd, ci) => {
-            insertCommand.run(p.id, cmd, ci)
-          })
-        }
-      })
-    })
-  })
-  tx()
+  cachedGroups = JSON.parse(JSON.stringify(groups))
+  writeData(cachedGroups)
 }
 
 export function resetToDefault() {
-  const tx = db.transaction(() => {
-    db.prepare('DELETE FROM custom_commands').run()
-    db.prepare('DELETE FROM projects').run()
-    db.prepare('DELETE FROM groups_t').run()
-
-    const insertGroup = db.prepare('INSERT INTO groups_t (id, name, sort_order) VALUES (?, ?, ?)')
-    const insertProject = db.prepare('INSERT INTO projects (id, group_id, name, sort_order) VALUES (?, ?, ?, ?)')
-
-    defaultGroups.forEach((g, gi) => {
-      insertGroup.run(g.id, g.name, gi)
-      g.projects.forEach((name, pi) => {
-        insertProject.run(genId(), g.id, name, pi)
-      })
-    })
-  })
-  tx()
+  cachedGroups = JSON.parse(JSON.stringify(defaultGroups))
+  writeData(cachedGroups)
 }

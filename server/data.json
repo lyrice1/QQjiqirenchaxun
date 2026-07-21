@@ -1,0 +1,596 @@
+[
+  {
+    "id": "g1",
+    "name": "免费项目",
+    "projects": [
+      {
+        "id": "mrudt3fotcdk",
+        "name": "实用小工具",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fom0e2",
+        "name": "京东",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fof0fa",
+        "name": "夸克搜资源",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foy3nu",
+        "name": "达能益生",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fon3ia",
+        "name": "趣网",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foeotm",
+        "name": "品赞",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo45km",
+        "name": "三网流量卡",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fofh82",
+        "name": "沪上阿姨",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fok2qp",
+        "name": "蜜雪",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo36um",
+        "name": "丫丫兔",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo0uuu",
+        "name": "朴朴超市",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foouf0",
+        "name": "游侠网",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foqzvb",
+        "name": "回收猿",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo8kl8",
+        "name": "同程",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fojjnn",
+        "name": "泰康",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3focwhy",
+        "name": "仰韶",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foityt",
+        "name": "永辉生活",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fokvv3",
+        "name": "小蚕",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fouyeh",
+        "name": "牛游谷",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3for9ct",
+        "name": "民发广场",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fotthx",
+        "name": "裕丰广场",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foookb",
+        "name": "佑三",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fow86f",
+        "name": "伊的家",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fomwod",
+        "name": "浓五酒馆",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foh6l5",
+        "name": "绿动新球",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fou2dc",
+        "name": "鼎鸿保龄球",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo8pzp",
+        "name": "回收蛙",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fottct",
+        "name": "薇诺娜",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foeyar",
+        "name": "豪爵",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fow4hy",
+        "name": "移动云盘",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fons4o",
+        "name": "绿地",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foy1c2",
+        "name": "Epic游戏",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fosqw6",
+        "name": "中康未来",
+        "customCommands": [],
+        "remark": ""
+      }
+    ]
+  },
+  {
+    "id": "g2",
+    "name": "付费项目",
+    "projects": [
+      {
+        "id": "mrudt3foc84z",
+        "name": "星芽短剧",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo2fcr",
+        "name": "看余杭",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fodyj2",
+        "name": "农夫山泉",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo3y2k",
+        "name": "粉象生活",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fony2x",
+        "name": "电信",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foq5tq",
+        "name": "Wx清粉",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foes96",
+        "name": "云任务签到",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fof9u5",
+        "name": "爱路桥",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo8v9k",
+        "name": "地图",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foow8e",
+        "name": "早纤生活",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fomwrh",
+        "name": "众安",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fouwi8",
+        "name": "福田",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo14mh",
+        "name": "驴充充",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fos8c2",
+        "name": "酒仙",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fowiuf",
+        "name": "雨云",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foo4zu",
+        "name": "联通云盘",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foie84",
+        "name": "雀巢",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3for1lg",
+        "name": "店铛铛",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo7h8n",
+        "name": "森选",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fop9si",
+        "name": "伟星",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fojqf3",
+        "name": "星韵",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fobg0k",
+        "name": "和合",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo11e0",
+        "name": "白鲸",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo04rn",
+        "name": "牛牛短剧",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foeyt0",
+        "name": "中华保",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo7t1j",
+        "name": "速看小说",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fojr4l",
+        "name": "老有工社",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foje8q",
+        "name": "星妈会",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo8yyv",
+        "name": "顾家家居",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fol18u",
+        "name": "牛卡福货主",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fobdrv",
+        "name": "战马能量",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foeljz",
+        "name": "爱仙居",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo78mp",
+        "name": "小米运动",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fogcqn",
+        "name": "顺丰",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3focdmz",
+        "name": "飞鹤",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo9k4i",
+        "name": "望潮",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo1dx0",
+        "name": "乐仔生活",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fokfh3",
+        "name": "慧生活",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fofi0k",
+        "name": "太平洋",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foxt0f",
+        "name": "衣城通",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo3nwm",
+        "name": "依立腾",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo7nu8",
+        "name": "台铃",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foiq5r",
+        "name": "壹品仓",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fox1xw",
+        "name": "四个朋友",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foldqj",
+        "name": "OPPO商城",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fowgl3",
+        "name": "铛铛一下",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo5adq",
+        "name": "潇洒",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo7w85",
+        "name": "中视频",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foa5bc",
+        "name": "小牛牛",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fow66a",
+        "name": "爱海盐",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fobz37",
+        "name": "江淮卡友",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo4pvl",
+        "name": "杜蕾斯",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fonez2",
+        "name": "keep运动",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foi2uz",
+        "name": "酷我",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foktqe",
+        "name": "甬派",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foxlj9",
+        "name": "白鲸鱼",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fog7ei",
+        "name": "天牛回收",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fofvgf",
+        "name": "旧衣小二",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fod4ea",
+        "name": "科普",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo0rq4",
+        "name": "嘉善",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fo10mr",
+        "name": "芳华未来",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3foyyrp",
+        "name": "爱坤",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fot8bq",
+        "name": "捷停车",
+        "customCommands": [],
+        "remark": ""
+      },
+      {
+        "id": "mrudt3fothps",
+        "name": "酷我提现",
+        "customCommands": [],
+        "remark": ""
+      }
+    ]
+  }
+]
