@@ -494,17 +494,22 @@ function tryParseExpiry(text) {
     }
 
     const acctMatch = line.match(/^\[(\d+)\](.*)/)
-    if (!acctMatch) continue
-    const num = acctMatch[1]
-    if (num === '0' || /^0/.test(num)) continue
-
-    let name = acctMatch[2].trim().replace(/^账号\s*[:：]\s*/, '').trim()
-    if (!name || /^(全部|删除|授权|批量)/.test(name)) continue
+    const acctLine = line.match(/账号\s*[:：]\s*(.+)/)
+    if (!acctMatch && !acctLine) continue
+    let name
+    if (acctMatch) {
+      const num = acctMatch[1]
+      if (num === '0' || /^0/.test(num)) continue
+      name = acctMatch[2].trim().replace(/^账号\s*[:：]\s*/, '').trim()
+      if (!name || /^(全部|删除|授权|批量)/.test(name)) continue
+    } else {
+      name = acctLine[1].trim()
+    }
 
     let date = null
-    const inlineDate = name.match(/\(到期\s*[:：]\s*(\d{4}[.\-]\d{2}[.\-]\d{2})\)/)
+    const inlineDate = name.match(/\(到期\s*[:：]\s*(\d{4}[.\-\/]\d{2}[.\-\/]\d{2})\)/)
     if (inlineDate) {
-      date = inlineDate[1].replace(/-/g, '.')
+      date = inlineDate[1].replace(/[-\/]/g, '.')
       const beforeParen = name.replace(/\(.*$/, '').trim()
       const parenMatch = name.match(/\(([^,)]+)/)
       const innerName = parenMatch ? parenMatch[1].trim() : ''
@@ -513,10 +518,10 @@ function tryParseExpiry(text) {
       for (let j = i + 1; j <= Math.min(i + 4, lines.length - 1); j++) {
         const nl = lines[j].trim()
         if (/^\[/.test(nl) && !/授权/.test(nl)) break
-        const m = nl.match(/授权\s*[:：]\s*[^\d]*(\d{4}[.\-]\d{2}[.\-]\d{2})/)
-        if (m) { date = m[1].replace(/-/g, '.'); break }
-        const m2 = nl.match(/(\d{4}[.\-]\d{2}[.\-]\d{2})/)
-        if (m2 && /到期|授权/.test(nl)) { date = m2[1].replace(/-/g, '.'); break }
+        const m = nl.match(/授权\s*[:：]\s*[^\d]*(\d{4}[.\-\/]\d{2}[.\-\/]\d{2})/)
+        if (m) { date = m[1].replace(/[-\/]/g, '.'); break }
+        const m2 = nl.match(/(\d{4}[.\-\/]\d{2}[.\-\/]\d{2})/)
+        if (m2 && /到期|授权/.test(nl)) { date = m2[1].replace(/[-\/]/g, '.'); break }
       }
     }
 
@@ -539,13 +544,13 @@ function tryParseExpiry(text) {
   debugParseResult.value = JSON.stringify(debugInfo, null, 2)
 
   if (!updated) {
-    const globalRe = /(\d{4}[.\-]\d{2}[.\-]\d{2})/g
+    const globalRe = /(\d{4}[.\-\/]\d{2}[.\-\/]\d{2})/g
     const fallback = []
     let m
     while ((m = globalRe.exec(text)) !== null) {
       const ctx = text.substring(Math.max(0, m.index - 30), m.index + m[0].length + 10)
       if (/到期|授权/.test(ctx)) {
-        fallback.push(m[1].replace(/-/g, '.'))
+        fallback.push(m[1].replace(/[-\/]/g, '.'))
       }
     }
     if (fallback.length) {

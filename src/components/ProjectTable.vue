@@ -396,13 +396,13 @@ function saveUndoSnapshot() {
 
 function getExpiryClass(expiryStr) {
   if (!expiryStr) return ''
-  const re = /(\d{4}\.\d{2}\.\d{2})/g
+  const re = /(\d{4}[.\-\/]\d{2}[.\-\/]\d{2})/g
   let m
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   let minDays = Infinity
   while ((m = re.exec(expiryStr)) !== null) {
-    const d = new Date(m[1].replace(/\./g, '-'))
+    const d = new Date(m[1].replace(/[.\/]/g, '-'))
     if (isNaN(d.getTime())) continue
     const days = Math.ceil((d - today) / (1000 * 60 * 60 * 24))
     if (days < minDays) minDays = days

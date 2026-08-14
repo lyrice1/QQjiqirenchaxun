@@ -285,11 +285,11 @@ export function updateProjectExpiryById(pid, expiry) {
 
 function parseEarliestExpiryTs(expiryStr) {
   if (!expiryStr) return Infinity
-  const re = /(\d{4}\.\d{2}\.\d{2})/g
+  const re = /(\d{4}[.\-\/]\d{2}[.\-\/]\d{2})/g
   let m
   let earliest = Infinity
   while ((m = re.exec(expiryStr)) !== null) {
-    const d = new Date(m[1].replace(/\./g, '-'))
+    const d = new Date(m[1].replace(/[.\/]/g, '-'))
     if (isNaN(d.getTime())) continue
     const ts = d.getTime()
     if (ts < earliest) earliest = ts
